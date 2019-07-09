@@ -1,13 +1,22 @@
 from asciimatics.screen import Screen
 from asciihelper import *
+from box import Box
+import random
 
 
 class TerminalFingers:
     min_dimensions = (10, 40)
     max_dimensions = (20, 80)
 
-    def __init__(self, screen):
+    def __init__(self, screen, words):
         self.screen = screen
+        self.word_bank = words
+        self.words = []
+        self.word_index = -1
+        self.lines = []
+
+        dim = self.get_dimensions()
+        self.word_box = Box(2, 2, dim[1]-4, dim[0]-4)
 
     def get_dimensions(self):
         cur = self.screen.dimensions
@@ -15,15 +24,43 @@ class TerminalFingers:
         height = clamp(cur[0], TerminalFingers.min_dimensions[0], TerminalFingers.max_dimensions[0])
         return (height, width)
 
-    def play(self):
+    def recalculate_lines(self):
+        self.lines = [[] for _ in range(self.word_box.height)]
+        test_index = self.word_index
+        for i in range(len(self.lines)):
+            line = self.lines[i]
+            space_left = self.word_box.width + 1
+            while space_left - len(self.words[test_index]) > 0:
+                line.append(self.words[test_index])
+                space_left -= (len(self.words[test_index]) + 1)
+                test_index += 1
+
+    def generate_word_batch(self):
+        space_left = TerminalFingers.max_dimensions[0] * TerminalFingers.max_dimensions[1] + 1
+        while space_left > 0:
+            new_word = random.choice(self.word_bank)
+            self.words.append(new_word)
+            space_left -= len(new_word) + 1
+
+    def new_game(self):
+        self.generate_word_batch()
+        self.recalculate_lines()
+
+    def display_frame(self):
         self.screen.clear()
+        dim = self.get_dimensions()
 
-        for i in range(8):
-            pass
-            #self.screen.print_at('Hello world!', 0, i, colour=i, attr=0, bg=(i - 1) % 7, transparent=False)
+        for i in range(len(self.lines)):
+            x = self.word_box.x
+            for word in self.lines[i]:
+                self.screen.print_at(word, x, self.word_box.y + i)
+                x += len(word) + 1
 
-        draw_box(self.screen, 0, 0, self.get_dimensions()[1], self.get_dimensions()[0])
+        draw_box(self.screen, Box(0, 0, dim[1], dim[0]), colour=Screen.COLOUR_CYAN, bg=Screen.COLOUR_BLACK)
         self.screen.refresh()
+
+    def play(self):
+        self.display_frame()
 
 
 
