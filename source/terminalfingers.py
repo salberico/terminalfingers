@@ -46,9 +46,13 @@ class TerminalFingers:
         self.generate_word_batch()
         self.recalculate_lines()
 
-    def display_frame(self):
-        self.screen.clear()
+    def draw_border(self):
         dim = self.get_dimensions()
+        draw_box(self.screen, Box(0, 0, dim[1], dim[0]), colour=Screen.COLOUR_CYAN, bg=Screen.COLOUR_BLACK)
+
+    def redraw_all(self):
+        self.screen.clear()
+        self.draw_border()
 
         for i in range(len(self.lines)):
             x = self.word_box.x
@@ -56,11 +60,16 @@ class TerminalFingers:
                 self.screen.print_at(word, x, self.word_box.y + i)
                 x += len(word) + 1
 
-        draw_box(self.screen, Box(0, 0, dim[1], dim[0]), colour=Screen.COLOUR_CYAN, bg=Screen.COLOUR_BLACK)
         self.screen.refresh()
 
     def play(self):
-        self.display_frame()
+        self.redraw_all()
+        while 1:
+            self.screen.wait_for_input(1.0)
+            event = self.screen.get_event()
+            if (event != None):
+                clear_at_box(self.screen, self.word_box)
+                self.screen.refresh()
 
 
 

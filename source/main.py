@@ -16,7 +16,6 @@ def main(screen):
     tf = TerminalFingers(screen, parse_words("../data/words.txt"))
     tf.new_game()
     tf.play()
-    sleep(1)
 
 
 if __name__ == "__main__":

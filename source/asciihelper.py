@@ -23,3 +23,7 @@ def draw_box(screen, box, colour=7, bg=0):
             screen.print_at('|', box.x, box.y+i, colour, 0, bg)
             screen.print_at('|', box.x+box.width-1, box.y+i, colour, 0, bg)
 
+
+def clear_at_box(screen, box):
+    for i in range(box.height):
+        screen.print_at(' '*box.width, box.x, box.y + i)
