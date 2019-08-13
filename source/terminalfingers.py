@@ -8,6 +8,8 @@ import random
 class TerminalFingers:
     min_dimensions = (10, 40)
     max_dimensions = (20, 80)
+    buffer_bg = Screen.COLOUR_BLUE
+    wrong_bg = Screen.COLOUR_RED
 
     def __init__(self, screen, words):
         self.screen = screen
@@ -86,8 +88,21 @@ class TerminalFingers:
         self.needs_refresh = True
 
     def draw_buffer(self):
-        self.screen.print_at(''.join(self.buffer), self.first_line_pos[self.word_index] + self.word_box.x, self.word_box.y)
+        self.screen.print_at(
+            ''.join(self.buffer),
+            self.first_line_pos[self.word_index] + self.word_box.x,
+            self.word_box.y,
+            bg=TerminalFingers.buffer_bg
+            )
         self.needs_refresh = True
+
+    def draw_cur_word(self):
+        self.screen.print_at(
+            self.words[self.word_index],
+            self.first_line_pos[self.word_index] + self.word_box.x,
+            self.word_box.y,
+            bg=TerminalFingers.buffer_bg
+            )
 
     def output_char(self, c):
         self.buffer.append(chr(c))
@@ -101,6 +116,7 @@ class TerminalFingers:
 
     def play(self):
         self.redraw_all()
+        self.draw_cur_word()
         while 1:
             self.screen.wait_for_input(1.0)
             event = self.screen.get_event()
